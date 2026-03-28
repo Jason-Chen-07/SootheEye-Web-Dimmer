@@ -1,31 +1,31 @@
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #15171a;
-  color: #f2f4f8;
+  background: #08090b;
+  color: #d2d8e0;
 }
 
 .wrap {
-  width: 280px;
+  width: 290px;
   padding: 14px;
 }
 
 h1 {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 18px;
+  color: #e1e7ee;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .block {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .block span {
@@ -39,6 +39,10 @@ input[type="range"] {
 }
 
 .hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #9ba4b0;
+}
   font-size: 12px;
   color: #c8d0da;
 }
