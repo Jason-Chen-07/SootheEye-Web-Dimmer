@@ -1,178 +1,52 @@
-const STYLE_ID = "smart-bright-dark-style";
+const STYLE_ID = "sootheve-night-style";
+const PANEL_ATTR = "data-sootheve-panel";
+const BUTTON_ATTR = "data-sootheve-original-btn";
 
 const DEFAULT_SETTINGS = {
   enabled: true,
-  threshold: 6,
-  mode: "auto", // auto | always | off
+  darkness: "heavy",        // soft | normal | heavy
+  imageComfort: "medium",   // low | medium | high
+  originalPreviewSeconds: 5
 };
 
-function parseRgb(color) {
-  if (!color) return null;
-
-  // rgb(255, 255, 255) / rgba(255,255,255,1)
-  const match = color.match(/\d+(\.\d+)?/g);
-  if (!match || match.length < 3) return null;
-
-  return {
-    r: Number(match[0]),
-    g: Number(match[1]),
-    b: Number(match[2]),
-  };
-}
-
-function luminance({ r, g, b }) {
-  const arr = [r, g, b].map((v) => {
-    v /= 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
-
-  return 0.2126 * arr[0] + 0.7152 * arr[1] + 0.0722 * arr[2];
-}
-
-function isLightColor(color) {
-  const rgb = parseRgb(color);
-  if (!rgb) return false;
-  return luminance(rgb) > 0.8;
-}
-
-function isDarkColor(color) {
-  const rgb = parseRgb(color);
-  if (!rgb) return false;
-  return luminance(rgb) < 0.25;
-}
-
-function getStyleColor(el, prop) {
-  if (!el) return null;
-  return getComputedStyle(el)[prop];
-}
-
-function scorePageBrightness() {
-  let score = 0;
-
-  const htmlBg = getStyleColor(document.documentElement, "backgroundColor");
-  const bodyBg = getStyleColor(document.body, "backgroundColor");
-  const bodyText = getStyleColor(document.body, "color");
-
-  if (htmlBg && isLightColor(htmlBg)) score += 2;
-  if (bodyBg && isLightColor(bodyBg)) score += 3;
-  if (bodyText && isDarkColor(bodyText)) score += 2;
-
-  const sampleEls = Array.from(
-    document.querySelectorAll("main, article, section, div, header, footer")
-  ).slice(0, 100);
-
-  let checked = 0;
-  let lightCount = 0;
-
-  for (const el of sampleEls) {
-    const rect = el.getBoundingClientRect();
-    if (rect.width < 200 || rect.height < 80) continue;
-
-    const bg = getComputedStyle(el).backgroundColor;
-    checked += 1;
-    if (isLightColor(bg)) lightCount += 1;
+const THEMES = {
+  soft: {
+    pageBg: "#0b0d10",
+    surface: "#131820",
+    surface2: "#1a2029",
+    text: "#cfd5de",
+    textSoft: "#a7b0bc",
+    heading: "#dde3ea",
+    border: "#28303a",
+    link: "#8fb7ff"
+  },
+  normal: {
+    pageBg: "#07090b",
+    surface: "#10141a",
+    surface2: "#171c24",
+    text: "#c8ced7",
+    textSoft: "#9ea7b3",
+    heading: "#d8dee6",
+    border: "#232b35",
+    link: "#8cb5ff"
+  },
+  heavy: {
+    pageBg: "#050607",
+    surface: "#0d1014",
+    surface2: "#12161c",
+    text: "#c3c9d2",
+    textSoft: "#98a1ad",
+    heading: "#d5dbe3",
+    border: "#222933",
+    link: "#8eb8ff"
   }
+};
 
-  if (checked > 0) {
-    const ratio = lightCount / checked;
-    if (ratio > 0.5) score += 3;
-    if (ratio > 0.75) score += 2;
-  }
-
-  return score;
-}
-
-function removeDarkMode() {
-  const oldStyle = document.getElementById(STYLE_ID);
-  if (oldStyle) oldStyle.remove();
-}
-
-function applyDarkMode() {
-  if (document.getElementById(STYLE_ID)) return;
-
-  const style = document.createElement("style");
-  style.id = STYLE_ID;
-
-  style.textContent = `
-    :root {
-      color-scheme: dark;
-      --ext-bg: #0d0f12;
-      --ext-bg-soft: #14181d;
-      --ext-card: #1a1f26;
-      --ext-text: #eef2f7;
-      --ext-text-soft: #c2c9d3;
-      --ext-border: #2b313b;
-      --ext-link: #79b8ff;
-      --ext-highlight: #212936;
-    }
-
-    html, body {
-      background: var(--ext-bg) !important;
-      color: var(--ext-text) !important;
-    }
-
-    body, main, article, section, header, footer, nav, aside, div {
-      border-color: var(--ext-border) !important;
-    }
-
-    main, article, section, header, footer, nav, aside {
-      background: transparent !important;
-    }
-
-    p, span, li, label, td, th, h1, h2, h3, h4, h5, h6 {
-      color: var(--ext-text) !important;
-    }
-
-    a {
-      color: var(--ext-link) !important;
-    }
-
-    pre, code, blockquote,
-    [class*="card"], [class*="panel"], [class*="container"] {
-      background: var(--ext-bg-soft) !important;
-      color: var(--ext-text) !important;
-      border-color: var(--ext-border) !important;
-    }
-
-    input, textarea, select, button {
-      background: var(--ext-card) !important;
-      color: var(--ext-text) !important;
-      border: 1px solid var(--ext-border) !important;
-    }
-
-    img, video, canvas, svg, picture {
-      filter: none !important;
-    }
-
-    ::selection {
-      background: var(--ext-highlight) !important;
-      color: var(--ext-text) !important;
-    }
-  `;
-
-  document.documentElement.appendChild(style);
-}
-
-function evaluate(settings) {
-  if (!settings.enabled || settings.mode === "off") {
-    removeDarkMode();
-    return;
-  }
-
-  if (settings.mode === "always") {
-    applyDarkMode();
-    return;
-  }
-
-  const score = scorePageBrightness();
-  console.log("[SmartDark] score =", score);
-
-  if (score >= settings.threshold) {
-    applyDarkMode();
-  } else {
-    removeDarkMode();
-  }
-}
+const IMAGE_FILTERS = {
+  low: "brightness(0.72) contrast(0.92) saturate(0.92)",
+  medium: "brightness(0.58) contrast(0.90) saturate(0.88)",
+  high: "brightness(0.45) contrast(0.88) saturate(0.82)"
+};
 
 function loadSettings() {
   return new Promise((resolve) => {
@@ -182,20 +56,228 @@ function loadSettings() {
   });
 }
 
-async function init() {
-  const settings = await loadSettings();
-  evaluate(settings);
+function removeExistingStyle() {
+  const oldStyle = document.getElementById(STYLE_ID);
+  if (oldStyle) oldStyle.remove();
 }
 
-init();
+function injectStyle(settings) {
+  removeExistingStyle();
 
-const observer = new MutationObserver(async () => {
+  const theme = THEMES[settings.darkness] || THEMES.heavy;
+  const imageFilter = IMAGE_FILTERS[settings.imageComfort] || IMAGE_FILTERS.medium;
+
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+    :root {
+      color-scheme: dark !important;
+      --sootheve-page-bg: ${theme.pageBg};
+      --sootheve-surface: ${theme.surface};
+      --sootheve-surface-2: ${theme.surface2};
+      --sootheve-text: ${theme.text};
+      --sootheve-text-soft: ${theme.textSoft};
+      --sootheve-heading: ${theme.heading};
+      --sootheve-border: ${theme.border};
+      --sootheve-link: ${theme.link};
+      --sootheve-image-filter: ${imageFilter};
+    }
+
+    html, body {
+      background: var(--sootheve-page-bg) !important;
+      color: var(--sootheve-text) !important;
+    }
+
+    html {
+      color-scheme: dark !important;
+    }
+
+    body,
+    main, article, section, aside, nav, header, footer,
+    div, form, dialog, table, thead, tbody, tr, td, th,
+    pre, code, blockquote, details, summary,
+    input, textarea, select, button {
+      background-color: var(--sootheve-surface) !important;
+      color: var(--sootheve-text) !important;
+      border-color: var(--sootheve-border) !important;
+      box-shadow: none !important;
+    }
+
+    h1, h2, h3, h4, h5, h6, strong, b {
+      color: var(--sootheve-heading) !important;
+    }
+
+    p, span, li, dt, dd, label, small, em, time {
+      color: var(--sootheve-text) !important;
+    }
+
+    a, a * {
+      color: var(--sootheve-link) !important;
+    }
+
+    hr {
+      border-color: var(--sootheve-border) !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--sootheve-text-soft) !important;
+    }
+
+    img, picture img, video, canvas, svg {
+      filter: var(--sootheve-image-filter) !important;
+      transition: filter 0.2s ease;
+    }
+
+    img[data-sootheve-original="true"],
+    picture img[data-sootheve-original="true"],
+    video[data-sootheve-original="true"],
+    canvas[data-sootheve-original="true"],
+    svg[data-sootheve-original="true"] {
+      filter: none !important;
+    }
+
+    [data-sootheve-panel="true"] {
+      position: absolute !important;
+      top: 8px !important;
+      right: 8px !important;
+      z-index: 2147483647 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding: 6px 8px !important;
+      background: rgba(8, 10, 12, 0.86) !important;
+      color: #d9dee5 !important;
+      border: 1px solid #2a313b !important;
+      border-radius: 10px !important;
+      font-size: 12px !important;
+      line-height: 1.2 !important;
+      backdrop-filter: blur(6px) !important;
+      max-width: 220px !important;
+    }
+
+    [data-sootheve-panel="true"] button {
+      appearance: none !important;
+      border: 1px solid #3a4451 !important;
+      background: #151a21 !important;
+      color: #dce3ea !important;
+      border-radius: 8px !important;
+      padding: 4px 8px !important;
+      font-size: 12px !important;
+      cursor: pointer !important;
+    }
+  `;
+
+  document.documentElement.appendChild(style);
+}
+
+function isLargeMedia(el) {
+  if (!el || !el.getBoundingClientRect) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width >= 180 && rect.height >= 120;
+}
+
+function ensureAnchorWrapper(el) {
+  const parent = el.parentElement;
+  if (!parent) return null;
+
+  const parentStyle = window.getComputedStyle(parent);
+  if (parentStyle.position === "static") {
+    parent.style.position = "relative";
+  }
+  return parent;
+}
+
+function removePanelFor(el) {
+  if (!el || !el.parentElement) return;
+  const panel = el.parentElement.querySelector(`[${PANEL_ATTR}="true"]`);
+  if (panel) panel.remove();
+}
+
+function showOriginalTemporarily(el, seconds) {
+  el.setAttribute("data-sootheve-original", "true");
+  removePanelFor(el);
+
+  window.setTimeout(() => {
+    el.removeAttribute("data-sootheve-original");
+    attachImagePanel(el, seconds);
+  }, seconds * 1000);
+}
+
+function attachImagePanel(el, seconds) {
+  if (!isLargeMedia(el)) return;
+  if (!el.parentElement) return;
+  if (el.parentElement.querySelector(`[${PANEL_ATTR}="true"]`)) return;
+
+  const wrapper = ensureAnchorWrapper(el);
+  if (!wrapper) return;
+
+  const panel = document.createElement("div");
+  panel.setAttribute(PANEL_ATTR, "true");
+  panel.innerHTML = `
+    <span>护眼模式已降低图片亮度</span>
+    <button type="button">原彩 ${seconds} 秒</button>
+  `;
+
+  const btn = panel.querySelector("button");
+  btn.setAttribute(BUTTON_ATTR, "true");
+  btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    showOriginalTemporarily(el, seconds);
+  });
+
+  wrapper.appendChild(panel);
+}
+
+function patchImages(settings) {
+  const mediaList = document.querySelectorAll("img, video, canvas, svg");
+  mediaList.forEach((el) => {
+    if (isLargeMedia(el)) {
+      attachImagePanel(el, settings.originalPreviewSeconds);
+    }
+  });
+}
+
+function clearPanels() {
+  document.querySelectorAll(`[${PANEL_ATTR}="true"]`).forEach((el) => el.remove());
+}
+
+function disableMode() {
+  removeExistingStyle();
+  clearPanels();
+}
+
+async function applyMode() {
   const settings = await loadSettings();
-  evaluate(settings);
+
+  if (!settings.enabled) {
+    disableMode();
+    return;
+  }
+
+  injectStyle(settings);
+  clearPanels();
+  patchImages(settings);
+}
+
+let applyTimer = null;
+
+function scheduleApply() {
+  if (applyTimer) clearTimeout(applyTimer);
+  applyTimer = setTimeout(() => {
+    applyMode();
+  }, 250);
+}
+
+applyMode();
+
+const observer = new MutationObserver(() => {
+  scheduleApply();
 });
 
 observer.observe(document.documentElement, {
   childList: true,
   subtree: true,
-  attributes: true,
+  attributes: false
 });
