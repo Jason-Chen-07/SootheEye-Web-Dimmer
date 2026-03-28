@@ -1,38 +1,37 @@
+const enabledEl = document.getElementById("enabled");
+const modeEl = document.getElementById("mode");
+const thresholdEl = document.getElementById("threshold");
+const thresholdValueEl = document.getElementById("thresholdValue");
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Bright Dark Mode</title>
-  <link rel="stylesheet" href="popup.css" />
-</head>
-<body>
-  <div class="wrap">
-    <h1>Smart Dark</h1>
+const DEFAULT_SETTINGS = {
+  enabled: true,
+  threshold: 6,
+  mode: "auto",
+};
 
-    <label class="row">
-      <span>Enable</span>
-      <input type="checkbox" id="enabled" />
-    </label>
+function loadSettings() {
+  chrome.storage.sync.get(DEFAULT_SETTINGS, (settings) => {
+    enabledEl.checked = settings.enabled;
+    modeEl.value = settings.mode;
+    thresholdEl.value = settings.threshold;
+    thresholdValueEl.textContent = settings.threshold;
+  });
+}
 
-    <label class="block">
-      <span>Mode</span>
-      <select id="mode">
-        <option value="auto">Auto</option>
-        <option value="always">Always on</option>
-        <option value="off">Off</option>
-      </select>
-    </label>
+function saveSettings() {
+  const settings = {
+    enabled: enabledEl.checked,
+    mode: modeEl.value,
+    threshold: Number(thresholdEl.value),
+  };
 
-    <label class="block">
-      <span>Threshold: <strong id="thresholdValue">6</strong></span>
-      <input type="range" id="threshold" min="1" max="12" value="6" />
-    </label>
+  thresholdValueEl.textContent = settings.threshold;
 
-    <p class="hint">Auto = only apply on bright/white pages</p >
-  </div>
+  chrome.storage.sync.set(settings);
+}
 
-  <script src="popup.js"></script>
-</body>
-</html>
+enabledEl.addEventListener("change", saveSettings);
+modeEl.addEventListener("change", saveSettings);
+thresholdEl.addEventListener("input", saveSettings);
+
+loadSettings();
