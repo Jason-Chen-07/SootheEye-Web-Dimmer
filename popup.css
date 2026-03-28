@@ -1,38 +1,44 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Bright Dark Mode</title>
-  <link rel="stylesheet" href="popup.css" />
-</head>
-<body>
-  <div class="wrap">
-    <h1>Smart Dark</h1>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #15171a;
+  color: #f2f4f8;
+}
 
-    <label class="row">
-      <span>Enable</span>
-      <input type="checkbox" id="enabled" />
-    </label>
+.wrap {
+  width: 280px;
+  padding: 14px;
+}
 
-    <label class="block">
-      <span>Mode</span>
-      <select id="mode">
-        <option value="auto">Auto</option>
-        <option value="always">Always on</option>
-        <option value="off">Off</option>
-      </select>
-    </label>
+h1 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
 
-    <label class="block">
-      <span>Threshold: <strong id="thresholdValue">6</strong></span>
-      <input type="range" id="threshold" min="1" max="12" value="6" />
-    </label>
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
-    <p class="hint">Auto = only apply on bright/white pages</p >
-  </div>
+.block {
+  display: block;
+  margin-bottom: 12px;
+}
 
-  <script src="popup.js"></script>
-</body>
-</html>
+.block span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+select,
+input[type="range"] {
+  width: 100%;
+}
+
+.hint {
+  font-size: 12px;
+  color: #c8d0da;
+}
