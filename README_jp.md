@@ -1,1 +1,5 @@
+
+<a href="README_jp.md"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/3840px-Flag_of_Japan.svg.png" width="32"></a>
+
+
 個人的にダークモードを好み、明るさを高く設定しています。しかし、ウェブサイトによっては対応していない場合があり、目に強い刺激を与えることがあります。そのため、視覚的に違和感がなく、ユーザーフレンドリーなブラウザ拡張機能を作りたいと考えています。
