@@ -1,4 +1,4 @@
-<a href="README.md"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_the_United_States.svg" width="32"></a>
+<a href="README.md"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/250px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png" width="32"></a>
 
 
 # My Browser Plugin Project
