@@ -96,14 +96,14 @@ function applyDarkMode() {
   style.textContent = `
     :root {
       color-scheme: dark;
-      --ext-bg: #15171a;
-      --ext-bg-soft: #1d2127;
-      --ext-card: #232831;
-      --ext-text: #f2f4f8;
-      --ext-text-soft: #c8d0da;
-      --ext-border: #353c48;
-      --ext-link: #7ab7ff;
-      --ext-highlight: #2b3340;
+      --ext-bg: #0d0f12;
+      --ext-bg-soft: #14181d;
+      --ext-card: #1a1f26;
+      --ext-text: #eef2f7;
+      --ext-text-soft: #c2c9d3;
+      --ext-border: #2b313b;
+      --ext-link: #79b8ff;
+      --ext-highlight: #212936;
     }
 
     html, body {
