@@ -47,6 +47,14 @@ const IMAGE_FILTERS = {
   medium: "brightness(0.58) contrast(0.90) saturate(0.88)",
   high: "brightness(0.45) contrast(0.88) saturate(0.82)"
 };
+function getSiteName() {
+  const host = location.hostname;
+
+  if (host.includes("bilibili.com")) return "bilibili";
+  if (host.includes("zhihu.com")) return "zhihu";
+
+  return "default";
+}
 
 function loadSettings() {
   return new Promise((resolve) => {
